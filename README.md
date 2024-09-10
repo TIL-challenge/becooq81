@@ -24,7 +24,7 @@ Each entry in this repository follows a consistent format:
 
 ## GitHub Actions ⚙️
 
-This repository utilizes GitHub Actions to automatically sync posts from Velog to this repository. You can find the workflow setup in `.github/workflows/update_blog.yml` and the workflow Python script in `/scripts/update_blog.py`. For further instructions, please refer to [this repository](https://github.com/becooq81/velog). 🔧
+This repository utilizes GitHub Actions to automatically sync posts from Velog to this repository. You can find the workflow setup in `.github/workflows/update_blog.yml` and the workflow Python script in `scripts/update_blog.py`. For further instructions, please refer to [this repository](https://github.com/becooq81/velog). 🔧
 
 ## Contributing 🤝
 

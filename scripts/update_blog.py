@@ -2,6 +2,10 @@ import feedparser
 import git
 import os
 from git.exc import GitCommandError
+from googletrans import Translator
+
+# Initialize the Google Translate API
+translator = Translator()
 
 # Velog RSS feed URL
 rss_url = 'https://api.velog.io/rss/@becooq81'
@@ -29,8 +33,17 @@ feed = feedparser.parse(rss_url)
 # Save each post as a file and commit
 for entry in feed.entries:
     
+    # Detect the language of the title
+    detected_language = translator.detect(entry.title).lang
+    
+    # Translate title to English if the detected language is Korean
+    if detected_language == 'ko':
+        translated_title = translator.translate(entry.title, src='ko', dest='en').text
+    else:
+        translated_title = entry.title  # Use the original title if it's not in Korean
+    
     # Remove or replace invalid characters from file's name
-    file_name = entry.title
+    file_name = translated_title
     file_name = file_name.replace('/', '-')  # replace slash with hyphen
     file_name = file_name.replace('\\', '-')  # replace back slash with hyphen
     
@@ -45,7 +58,7 @@ for entry in feed.entries:
         
         # Commit on GitHub
         repo.git.add(file_path)
-        repo.git.commit('-m', f'Add post: {entry.title}')
+        repo.git.commit('-m', f'Add post: {translated_title}')
         
 # Push changes to repository
 repo.git.push()

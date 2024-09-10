@@ -46,6 +46,7 @@ for entry in feed.entries:
     file_name = translated_title
     file_name = file_name.replace('/', '-')  # replace slash with hyphen
     file_name = file_name.replace('\\', '-')  # replace back slash with hyphen
+    file_name = file_name.replace(' ', '-')  # replace back slash with hyphen
     
     # Replace any additional characters if necessary
     file_name += '.md'

@@ -30,6 +30,15 @@ repo.git.config('--global', 'user.email', 'github-actions[bot]@users.noreply.git
 # Parse RSS feed
 feed = feedparser.parse(rss_url)
 
+# Define method to process titles
+def process_title(title):
+    title = title.replace('/', '-')  # replace slash with hyphen
+    title = title.replace('\\', '-')  # replace back slash with hyphen
+    title = title.replace(' ', '-')  # replace back slash with hyphen
+    title += '.md'
+    return title
+
+
 # Save each post as a file and commit
 for entry in feed.entries:
     
@@ -62,10 +71,3 @@ for entry in feed.entries:
 # Push changes to repository
 repo.git.push()
 
-# Define method to process titles
-def process_title(title):
-    title = title.replace('/', '-')  # replace slash with hyphen
-    title = title.replace('\\', '-')  # replace back slash with hyphen
-    title = title.replace(' ', '-')  # replace back slash with hyphen
-    title += '.md'
-    return title

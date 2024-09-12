@@ -46,10 +46,10 @@ for entry in feed.entries:
     detected_language = translator.detect(entry.title).lang
     
     # Translate title to English if the detected language is Korean
+    translated_title = entry.title  # Default to original title
     if detected_language == 'ko':
         translated_title = translator.translate(entry.title, src='ko', dest='en').text
-    else:
-        translated_title = entry.title  # Use the original title if it's not in Korean
+
     
     # Remove or replace invalid characters from file's name
     file_name = process_title(entry.title)
@@ -65,7 +65,7 @@ for entry in feed.entries:
             file.write(entry.description)  # Write contents into file
         
         # Commit on GitHub
-        repo.git.add(file_path)
+        repo.git.add(translated_path)
         repo.git.commit('-m', f'Add post: {file_name}')
         
 # Push changes to repository

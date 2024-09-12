@@ -43,23 +43,29 @@ for entry in feed.entries:
         translated_title = entry.title  # Use the original title if it's not in Korean
     
     # Remove or replace invalid characters from file's name
-    file_name = translated_title
-    file_name = file_name.replace('/', '-')  # replace slash with hyphen
-    file_name = file_name.replace('\\', '-')  # replace back slash with hyphen
-    file_name = file_name.replace(' ', '-')  # replace back slash with hyphen
+    file_name = process_title(entry.title)
+    translated_name = process_title(translated_title)
     
-    # Replace any additional characters if necessary
-    file_name += '.md'
+    # Create file path
     file_path = os.path.join(posts_dir, file_name)
+    translated_path = os.path.join(posts_dir, translated_name)
     
     # Create file if not exists
     if not os.path.exists(file_path):
-        with open(file_path, 'w', encoding='utf-8') as file:
+        with open(translated_path, 'w', encoding='utf-8') as file:
             file.write(entry.description)  # Write contents into file
         
         # Commit on GitHub
         repo.git.add(file_path)
-        repo.git.commit('-m', f'Add post: {translated_title}')
+        repo.git.commit('-m', f'Add post: {file_name}')
         
 # Push changes to repository
 repo.git.push()
+
+# Define method to process titles
+def process_title(title):
+    title = title.replace('/', '-')  # replace slash with hyphen
+    title = title.replace('\\', '-')  # replace back slash with hyphen
+    title = title.replace(' ', '-')  # replace back slash with hyphen
+    title += '.md'
+    return title

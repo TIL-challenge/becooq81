@@ -36,6 +36,8 @@ def process_title(title):
     title = title.replace('/', '-')  # Replace slash with hyphen
     title = title.replace('\\', '-')  # Replace backslash with hyphen
     title = title.replace(' ', '-')  # Replace space with hyphen
+    title = title.replace('.', '') # Remove periods
+    title = title.replace(',', '') # Remove commas
     title += '.md'
     return title
 

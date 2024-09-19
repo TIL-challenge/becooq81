@@ -18,7 +18,7 @@ jobs:
         with:
           ref: main  # Ensure this matches your working branch
           persist-credentials: true  # Ensure GitHub token is used
-
+          fetch-depth: 0 # Fetch all history for all branches and tags
       - name: Setup Git Config
         run: |
           git config --global user.email "github-actions[bot]@github.com"

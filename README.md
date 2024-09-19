@@ -1,52 +1,35 @@
-name: Update Commit Activity Badge
+# becooq81's TIL (Today I Learned) 🐣
 
-on:
-  schedule:
-    - cron: '0 0 * * 0'  # Runs weekly on Sunday
-  workflow_dispatch:  # Allows manual run
+Welcome to my TIL (Today I Learned) repository! This is where I document my daily learnings and discoveries related to programming and algorithms. Whether it’s a new technique, a solved problem, or an insightful concept, you'll find it here. 🚀
 
-jobs:
-  update-commit-badge:
-    runs-on: ubuntu-latest
+## Contents 📚
 
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v2
-        with:
-          ref: main  # Make sure this matches your working branch
-          persist-credentials: true  # Ensure GitHub token is used
+- **Programming:** Notes, code snippets, and tips on various programming languages and tools. 💻
+- **Algorithms:** Insights and implementations of different algorithms, including problem-solving strategies and optimizations. 🔍
+- **System Architecture and Design:** Observations and designs related to system architecture, software engineering principles, and best practices. 🏗️
 
-      - name: Setup Git Config
-        run: |
-          git config --global user.email "github-actions[bot]@github.com"
-          git config --global user.name "github-actions[bot]"
+## Velog Posts 📝
 
-      - name: Count Commit Days
-        id: count_days
-        run: |
-          # Count unique commit days
-          days=$(git log --since='7 days ago' --format='%cd' --date=format:'%A' | sort -u | wc -l)
-          echo "Commit days found: $days"
-          echo "commit_days=$days" >> $GITHUB_ENV
-          echo "::set-output name=commit_days::$days"
+I also share some of these learnings on my [Velog](https://velog.io/@becooq81/posts). Posts from Velog are periodically uploaded to this repository using GitHub Actions, ensuring that everything is synchronized and up-to-date. 🔄
 
-      - name: Create Badge
-        run: |
-          # Create badge with cache-busting parameter
-          badge_url="https://img.shields.io/badge/commit_days-${{ env.commit_days }}-green?cache=$(date +%s)"
-          echo "Badge URL: $badge_url"
-          echo "![Commit Days]($badge_url)" > commit_badge.md
+## Structure 📄
 
-      - name: Update README with Badge
-        run: |
-          # Replace the old badge line in README.md
-          sed -i '/Commit Days/d' README.md  # Remove old badge line if exists
-          echo "![Commit Days]($badge_url)" >> README.md  # Add the new badge
+Each entry in this repository follows a consistent format:
 
-      - name: Commit Changes
-        run: |
-          git add README.md
-          git commit -m "Update commit days badge"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+- **Date:** The date when the learning was recorded. 📅
+- **Topic:** A brief title or summary of the concept learned. 🏷️
+- **Details:** In-depth explanation or notes. 🗒️
+- **Code:** Relevant code snippets or examples. 💡
+- **References:** Links to external resources or documentation, if applicable. 🌐
+
+## GitHub Actions ⚙️
+
+This repository utilizes GitHub Actions to automatically sync posts from Velog to this repository. You can find the workflow setup in `.github/workflows/update_blog.yml` and the workflow Python script in `scripts/update_blog.py`. For further instructions, please refer to [this repository](https://github.com/becooq81/velog). 🔧
+
+## Contributing 🤝
+
+Feel free to contribute by submitting a pull request or opening an issue if you spot any errors or have suggestions for improvement. 💬
+
+## License 📜
+
+This repository is licensed under the [MIT License](LICENSE).

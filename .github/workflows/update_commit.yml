@@ -20,9 +20,14 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
+      - name: Check Commit Logs
+        run: |
+          git log --since='7 days ago' --format='%cd' --date=format:'%A'
+
       - name: Count Commit Days
         run: |
-          days=$(git log --since='7 days ago' --format='%cd' --date=format:'%A' | sort -u | wc -l)
+          days=$(git log --since='7 days ago' --pretty=format:'%ad' --date=format:'%A' | sort -u | wc -l)
+          echo "Commit days found: $days"
           echo "commit_days=$days" >> $GITHUB_ENV
 
       - name: Create Badge

@@ -3,7 +3,7 @@ name: Update Commit Activity Badge
 on:
   push:
     branches:
-      main
+      - main
   schedule:
     - cron: '0 0 * * 0'  # Runs weekly on Sunday
   workflow_dispatch:  # Allows manual run
@@ -16,7 +16,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v2
         with:
-          ref: main  # Make sure this matches your working branch
+          ref: main  # Change this if using a different branch
           persist-credentials: true  # Ensure GitHub token is used
 
       - name: Setup Git Config
@@ -35,24 +35,27 @@ jobs:
 
       - name: Create Badge
         run: |
-          # Create badge with cache-busting parameter
+          # Create badge URL with cache-busting parameter to force refresh
           badge_url="https://img.shields.io/badge/commit_days-${{ env.commit_days }}-green?cache=$(date +%s)"
           echo "Badge URL: $badge_url"
-          echo  "url=$badge_url" >> $GITHUB_ENV
-          echo "![Commit Days](${{ env.url }})" > commit_badge.md
+          echo "url=$badge_url" >> $GITHUB_ENV
+          echo "![Commit Days](${badge_url})" > commit_badge.md
 
       - name: Update README with Badge
         run: |
-          # Replace the old badge line in README.md
-          sed -i '/Commit Days/d' README.md  # Remove old badge line if exists
-          echo "![Commit Days]($badge_url)" >> README.md  # Add the new badge
+          # Remove old badge line if exists and append new badge
+          sed -i '/Commit Days/d' README.md
+          cat commit_badge.md >> README.md
 
       - name: Commit Changes
         run: |
           git add README.md
+          git status  # Check if changes are staged correctly
           git commit -m "Update commit days badge"
-      - name: Push changes
+
+      - name: Push Changes
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          GH_PAT: ${{ secrets.GH_PAT }}  # Ensure this token has push permissions
         run: |
-          git push https://${GH_PAT}@github.com/TIL-challenge/becooq81.git
+          # Push changes back to GitHub using the PAT
+          git push https://x-access-token:${GH_PAT}@github.com/<your-username>/<repo-name>.git

@@ -16,7 +16,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v2
         with:
-          ref: main  # Change this to your working branch if needed
+          ref: main  # Ensure this matches your working branch
           persist-credentials: true  # Ensure GitHub token is used
 
       - name: Setup Git Config
@@ -27,28 +27,26 @@ jobs:
       - name: Count Total Commit Days with Debugging
         id: total_commit_days
         run: |
-          # Display all commit dates to debug the counting issue
-          echo "Debugging commit dates:"
+          # Debugging commit dates: Display all commit dates in the format YYYY-MM-DD
+          echo "Debugging commit dates in the entire history:"
           git log --format='%cd' --date=format:'%Y-%m-%d' | sort | uniq
           
           # Count total unique commit days in the entire history using full dates
           total_days=$(git log --format='%cd' --date=format:'%Y-%m-%d' | sort -u | wc -l)
           echo "Total commit days found: $total_days"
           echo "total_commit_days=$total_days" >> $GITHUB_ENV
-          echo "::set-output name=total_commit_days::$total_days"
 
       - name: Count Weekly Commit Days with Debugging
         id: weekly_commit_days
         run: |
-          # Display commit dates in the last 7 days for debugging
-          echo "Debugging weekly commit dates:"
+          # Debugging weekly commit dates: Display commit dates in the last 7 days
+          echo "Debugging commit dates in the last 7 days:"
           git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' | sort | uniq
           
           # Count unique commit days in the last 7 days using full dates
           weekly_days=$(git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' | sort -u | wc -l)
           echo "Weekly commit days found: $weekly_days"
           echo "weekly_commit_days=$weekly_days" >> $GITHUB_ENV
-          echo "::set-output name=weekly_commit_days::$weekly_days"
 
       - name: Create Badges
         run: |
@@ -65,7 +63,7 @@ jobs:
           # Remove old badge lines if they exist and prepend new badges to the top of README
           sed -i '/Total Commit Days/d' README.md
           sed -i '/Weekly Commit Days/d' README.md
-          # Create a temporary file to insert badges at the top
+          # Insert badges at the top of the README
           cat total_commit_badge.md weekly_commit_badge.md README.md > temp_readme.md
           mv temp_readme.md README.md  # Replace the old README with the updated one
 

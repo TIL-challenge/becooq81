@@ -38,7 +38,8 @@ jobs:
           # Create badge with cache-busting parameter
           badge_url="https://img.shields.io/badge/commit_days-${{ env.commit_days }}-green?cache=$(date +%s)"
           echo "Badge URL: $badge_url"
-          echo "![Commit Days]($badge_url)" > commit_badge.md
+          echo  "url=$badge_url" >> $GITHUB_ENV
+          echo "![Commit Days](${{ env.url }})" > commit_badge.md
 
       - name: Update README with Badge
         run: |

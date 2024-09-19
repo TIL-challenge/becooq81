@@ -22,19 +22,29 @@ jobs:
           
       - name: Check Commit Logs
         run: |
+          # Display commit days for debugging
           git log --since='7 days ago' --format='%cd' --date=format:'%A'
 
       - name: Count Commit Days
+        id: count_days
         run: |
-          days=$(git log --since='7 days ago' --pretty=format:'%ad' --date=format:'%A' | sort -u | wc -l)
+          # Count unique days from commit logs
+          days=$(git log --since='7 days ago' --format='%cd' --date=format:'%A' | sort -u | wc -l)
           echo "Commit days found: $days"
           echo "commit_days=$days" >> $GITHUB_ENV
+          echo "::set-output name=commit_days::$days"
+
+      - name: Debug Environment Variable
+        run: |
+          echo "Environment commit_days: $commit_days"
 
       - name: Create Badge
         run: |
-          badge_url="https://img.shields.io/badge/commit_days-$commit_days-green"
+          # Fetch commit_days from the environment
+          badge_url="https://img.shields.io/badge/commit_days-${{ env.commit_days }}-green"
           echo "![Commit Days]($badge_url)" > commit_badge.md
 
       - name: Update README
         run: |
+          # Append badge to README.md
           cat commit_badge.md >> README.md

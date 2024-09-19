@@ -33,3 +33,4 @@ Feel free to contribute by submitting a pull request or opening an issue if you 
 ## License 📜
 
 This repository is licensed under the [MIT License](LICENSE).
+![Commit Days]()

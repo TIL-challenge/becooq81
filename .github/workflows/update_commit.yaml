@@ -1,0 +1,28 @@
+name: Update Commit Activity Badge
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Runs weekly on Sunday
+  workflow_dispatch:  # Allows manual run
+
+jobs:
+  update-commit-badge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Count Commit Days
+        run: |
+          days=$(git log --since='7 days ago' --format='%cd' --date=format:'%A' | sort -u | wc -l)
+          echo "commit_days=$days" >> $GITHUB_ENV
+
+      - name: Create Badge
+        run: |
+          badge_url="https://img.shields.io/badge/commit_days-$commit_days-green"
+          echo "![Commit Days]($badge_url)" > commit_badge.md
+
+      - name: Update README
+        run: |
+          cat commit_badge.md >> README.md

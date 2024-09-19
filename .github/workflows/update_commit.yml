@@ -40,11 +40,17 @@ jobs:
 
       - name: Create Badge
         run: |
-          # Fetch commit_days from the environment
-          badge_url="https://img.shields.io/badge/commit_days-${{ env.commit_days }}-green"
+          # Create a badge URL with cache-busting parameter to avoid showing old value
+          badge_url="https://img.shields.io/badge/commit_days-${{ env.commit_days }}-green?cache=$(date +%s)"
+          echo "Badge URL: $badge_url"
           echo "![Commit Days]($badge_url)" > commit_badge.md
+
+      - name: Debug Badge Content
+        run: |
+          cat commit_badge.md  # Show the contents to ensure correct badge value
 
       - name: Update README
         run: |
-          # Append badge to README.md
+          # Safely append the badge to README.md
+          echo "Appending the badge to README.md"
           cat commit_badge.md >> README.md

@@ -51,6 +51,8 @@ jobs:
         run: |
           git add README.md
           git commit -m "Update commit days badge"
-          git push
+      - name: Push changes
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          git push https://${GH_PAT}@github.com/TIL-challenge/becooq81.git

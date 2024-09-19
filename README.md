@@ -1,6 +1,8 @@
 # becooq81's TIL (Today I Learned) 🐣
 
 Welcome to my TIL (Today I Learned) repository! This is where I document my daily learnings and discoveries related to programming and algorithms. Whether it’s a new technique, a solved problem, or an insightful concept, you'll find it here. 🚀
+## Weekly Commit Activity
+![Commit Days](https://img.shields.io/badge/commit_days-0-green)
 
 ## Contents 📚
 

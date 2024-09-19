@@ -3,7 +3,7 @@ name: Update Commit Activity Badges
 on:
   push:
     branches:
-      - main  # Corrected syntax to list branches properly
+      - main
   schedule:
     - cron: '0 0 * * 0'  # Runs weekly on Sunday
   workflow_dispatch:  # Allows manual run
@@ -24,20 +24,28 @@ jobs:
           git config --global user.email "github-actions[bot]@github.com"
           git config --global user.name "github-actions[bot]"
 
-      - name: Count Total Commit Days
+      - name: Count Total Commit Days with Debugging
         id: total_commit_days
         run: |
-          # Count total unique commit days in the entire history
-          total_days=$(git log --format='%cd' --date=format:'%A' | sort -u | wc -l)
+          # Display all commit dates to debug the counting issue
+          echo "Debugging commit dates:"
+          git log --format='%cd' --date=format:'%A' | sort
+          
+          # Count total unique commit days in the entire history with debug
+          total_days=$(git log --format='%cd' --date=format:'%Y-%m-%d' | sort -u | wc -l)
           echo "Total commit days found: $total_days"
           echo "total_commit_days=$total_days" >> $GITHUB_ENV
           echo "::set-output name=total_commit_days::$total_days"
 
-      - name: Count Weekly Commit Days
+      - name: Count Weekly Commit Days with Debugging
         id: weekly_commit_days
         run: |
-          # Count unique commit days in the last 7 days
-          weekly_days=$(git log --since='7 days ago' --format='%cd' --date=format:'%A' | sort -u | wc -l)
+          # Display commit dates in the last 7 days for debugging
+          echo "Debugging weekly commit dates:"
+          git log --since='7 days ago' --format='%cd' --date=format:'%A' | sort
+          
+          # Count unique commit days in the last 7 days with debug
+          weekly_days=$(git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' | sort -u | wc -l)
           echo "Weekly commit days found: $weekly_days"
           echo "weekly_commit_days=$weekly_days" >> $GITHUB_ENV
           echo "::set-output name=weekly_commit_days::$weekly_days"
@@ -72,4 +80,4 @@ jobs:
           GH_PAT: ${{ secrets.GH_PAT }}  # Ensure this token has push permissions
         run: |
           # Push changes back to GitHub using the PAT
-          git push https://x-access-token:${GH_PAT}@github.com/TIL-Challenge/becooq81.git
+          git push https://x-access-token:${GH_PAT}@github.com/TIL-challenge/becooq81.git

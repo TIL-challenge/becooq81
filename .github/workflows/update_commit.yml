@@ -29,9 +29,9 @@ jobs:
         run: |
           # Display all commit dates to debug the counting issue
           echo "Debugging commit dates:"
-          git log --format='%cd' --date=format:'%A' | sort
+          git log --format='%cd' --date=format:'%Y-%m-%d' | sort | uniq
           
-          # Count total unique commit days in the entire history with debug
+          # Count total unique commit days in the entire history using full dates
           total_days=$(git log --format='%cd' --date=format:'%Y-%m-%d' | sort -u | wc -l)
           echo "Total commit days found: $total_days"
           echo "total_commit_days=$total_days" >> $GITHUB_ENV
@@ -42,9 +42,9 @@ jobs:
         run: |
           # Display commit dates in the last 7 days for debugging
           echo "Debugging weekly commit dates:"
-          git log --since='7 days ago' --format='%cd' --date=format:'%A' | sort
+          git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' | sort | uniq
           
-          # Count unique commit days in the last 7 days with debug
+          # Count unique commit days in the last 7 days using full dates
           weekly_days=$(git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' | sort -u | wc -l)
           echo "Weekly commit days found: $weekly_days"
           echo "weekly_commit_days=$weekly_days" >> $GITHUB_ENV

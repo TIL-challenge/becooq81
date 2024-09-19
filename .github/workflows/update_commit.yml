@@ -24,26 +24,26 @@ jobs:
           git config --global user.email "github-actions[bot]@github.com"
           git config --global user.name "github-actions[bot]"
 
-      - name: Count Total Commit Days with Debugging
+      - name: Count Total Commit Days
         id: total_commit_days
         run: |
-          # Debugging commit dates: Display all commit dates in the format YYYY-MM-DD
-          echo "Debugging commit dates in the entire history:"
-          git log --format='%cd' --date=format:'%Y-%m-%d' | sort | uniq
+          # Display all unique commit dates in the entire history
+          echo "All unique commit dates in the entire history:"
+          git log --format='%cd' --date=format:'%Y-%m-%d' | sort -u
           
-          # Count total unique commit days in the entire history using full dates
+          # Count total unique commit days in the entire history
           total_days=$(git log --format='%cd' --date=format:'%Y-%m-%d' | sort -u | wc -l)
           echo "Total commit days found: $total_days"
           echo "total_commit_days=$total_days" >> $GITHUB_ENV
 
-      - name: Count Weekly Commit Days with Debugging
+      - name: Count Weekly Commit Days
         id: weekly_commit_days
         run: |
-          # Debugging weekly commit dates: Display commit dates in the last 7 days
-          echo "Debugging commit dates in the last 7 days:"
-          git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' | sort | uniq
+          # Display unique commit dates within the last 7 days
+          echo "Unique commit dates in the last 7 days:"
+          git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' | sort -u
           
-          # Count unique commit days in the last 7 days using full dates
+          # Count unique commit days in the last 7 days
           weekly_days=$(git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' | sort -u | wc -l)
           echo "Weekly commit days found: $weekly_days"
           echo "weekly_commit_days=$weekly_days" >> $GITHUB_ENV
@@ -78,4 +78,4 @@ jobs:
           GH_PAT: ${{ secrets.GH_PAT }}  # Ensure this token has push permissions
         run: |
           # Push changes back to GitHub using the PAT
-          git push https://x-access-token:${GH_PAT}@github.com/TIL-challenge/becooq81.git
+          git push https://x-access-token:${GH_PAT}@github.com/<your-username>/<repo-name>.git

@@ -24,28 +24,41 @@ jobs:
           git config --global user.email "github-actions[bot]@github.com"
           git config --global user.name "github-actions[bot]"
 
-      - name: Count Commit Days
-        id: count_days
+      - name: Count Total Commit Days
+        id: total_commit_days
         run: |
-          # Count unique commit days
-          days=$(git log --since='7 days ago' --format='%cd' --date=format:'%A' | sort -u | wc -l)
-          echo "Commit days found: $days"
-          echo "commit_days=$days" >> $GITHUB_ENV
-          echo "::set-output name=commit_days::$days"
+          # Count total unique commit days in the entire history
+          total_days=$(git log --format='%cd' --date=format:'%A' | sort -u | wc -l)
+          echo "Total commit days found: $total_days"
+          echo "total_commit_days=$total_days" >> $GITHUB_ENV
+          echo "::set-output name=total_commit_days::$total_days"
 
-      - name: Create Badge
+      - name: Count Weekly Commit Days
+        id: weekly_commit_days
         run: |
-          # Create badge URL with cache-busting parameter to force refresh
-          badge_url="https://img.shields.io/badge/commit_days-${{ env.commit_days }}-green?cache=$(date +%s)"
-          echo "Badge URL: $badge_url"
-          echo "url=$badge_url" >> $GITHUB_ENV
-          echo "![Commit Days](${badge_url})" > commit_badge.md
+          # Count unique commit days in the last 7 days
+          weekly_days=$(git log --since='7 days ago' --format='%cd' --date=format:'%A' | sort -u | wc -l)
+          echo "Weekly commit days found: $weekly_days"
+          echo "weekly_commit_days=$weekly_days" >> $GITHUB_ENV
+          echo "::set-output name=weekly_commit_days::$weekly_days"
 
-      - name: Update README with Badge
+     - name: Create Badges
         run: |
-          # Remove old badge line if exists and append new badge
-          sed -i '/Commit Days/d' README.md
-          cat commit_badge.md >> README.md
+          # Create badge URLs with cache-busting parameter to force refresh
+          total_badge_url="https://img.shields.io/badge/total_commit_days-${{ env.total_commit_days }}-blue?cache=$(date +%s)"
+          weekly_badge_url="https://img.shields.io/badge/weekly_commit_days-${{ env.weekly_commit_days }}-green?cache=$(date +%s)"
+          echo "Total Badge URL: $total_badge_url"
+          echo "Weekly Badge URL: $weekly_badge_url"
+          echo "![Total Commit Days]($total_badge_url)" > total_commit_badge.md
+          echo "![Weekly Commit Days]($weekly_badge_url)" > weekly_commit_badge.md
+
+      - name: Update README with Badges
+        run: |
+          # Remove old badge lines if they exist and append new badges
+          sed -i '/Total Commit Days/d' README.md
+          sed -i '/Weekly Commit Days/d' README.md
+          cat total_commit_badge.md >> README.md
+          cat weekly_commit_badge.md >> README.md
 
       - name: Commit Changes
         run: |

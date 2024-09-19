@@ -12,7 +12,11 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
-
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
       - name: Count Commit Days
         run: |
           days=$(git log --since='7 days ago' --format='%cd' --date=format:'%A' | sort -u | wc -l)

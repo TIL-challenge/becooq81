@@ -21,14 +21,14 @@ posts_dir = os.path.join(repo_path, 'velog-posts')
 # File to store processed content hashes
 hash_file_path = os.path.join(repo_path, 'processed_hashes.json')
 
-# Create 'velog-posts' if directory does not exist
+# Create 'velog-posts' if the directory does not exist
 if not os.path.exists(posts_dir):
     os.makedirs(posts_dir)
 
-# Load repository
+# Load the repository
 repo = git.Repo(repo_path)
 
-# Double check git configuration
+# Double-check Git configuration
 repo.git.config('--global', 'user.name', 'github-actions[bot]')
 repo.git.config('--global', 'user.email', 'github-actions[bot]@users.noreply.github.com')
 
@@ -37,11 +37,7 @@ feed = feedparser.parse(rss_url)
 
 # Define method to process titles
 def process_title(title):
-    title = title.replace('/', '-')  # Replace slash with hyphen
-    title = title.replace('\\', '-')  # Replace backslash with hyphen
-    title = title.replace(' ', '-')  # Replace space with hyphen
-    title = title.replace('.', '')  # Remove periods
-    title = title.replace(',', '')  # Remove commas
+    title = title.replace('/', '-').replace('\\', '-').replace(' ', '-').replace('.', '').replace(',', '')
     title += '.md'
     return title
 
@@ -63,7 +59,7 @@ for entry in feed.entries:
     detected_language = translator.detect(entry.title).lang
     
     # Translate title to English if the detected language is Korean
-    translated_title = entry.title  # Default to original title
+    translated_title = entry.title
     if detected_language == 'ko':
         translated_title = translator.translate(entry.title, src='ko', dest='en').text
 
@@ -78,7 +74,6 @@ for entry in feed.entries:
 
     # Check if this content hash has already been processed
     if content_hash in processed_hashes:
-        # Skip to avoid redundant uploads
         print(f"Skipping already processed post: {entry.title}")
         continue
     
@@ -97,14 +92,38 @@ for entry in feed.entries:
     # Create or overwrite the file only if content has changed
     if content_changed:
         with open(file_path, 'w', encoding='utf-8') as file:
-            file.write(new_content)  # Write the post content into the file
+            file.write(new_content)
 
         # Stage and commit the changes
         repo.git.add(file_path)
-        repo.git.commit('-m', f'Add or update post: {translated_name}')
-        
-# Push changes to repository
-repo.git.push()
+        try:
+            repo.git.commit('-m', f'Add or update post: {translated_name}')
+        except GitCommandError as e:
+            print(f"Failed to commit: {e}")
+
+# Fetch, rebase, and push changes to the repository
+try:
+    # Fetch and rebase to ensure the local branch is up to date
+    print("Fetching latest changes...")
+    repo.git.fetch('origin', 'main')
+    print("Rebasing local changes...")
+    repo.git.rebase('origin/main')
+
+    # Push changes
+    print("Pushing changes to remote...")
+    repo.git.push()
+except GitCommandError as e:
+    print(f"Git command failed: {e}")
+    if 'Updates were rejected' in str(e):
+        print("Rebase failed due to remote changes. Attempting to resolve.")
+        try:
+            repo.git.rebase('--abort')  # Abort if there's an ongoing rebase
+            repo.git.pull('--rebase')  # Pull and rebase again
+            print("Rebasing completed. Retrying push...")
+            repo.git.push()
+        except GitCommandError as push_error:
+            print(f"Push failed after resolving: {push_error}")
+            print("Manual intervention may be required.")
 
 # Save the updated processed hashes to file
 with open(hash_file_path, 'w', encoding='utf-8') as hash_file:

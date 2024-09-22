@@ -36,7 +36,7 @@ jobs:
         id: weekly_commit_days
         run: |
           git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' | sort -u
-          weekly_days=$(git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' | sort -u | wc -l)
+          weekly_days=$(git log --since='7 days ago' --format='%Y-%m-%d' | sort -u | wc -l)
           echo "weekly_commit_days=$weekly_days" >> $GITHUB_ENV
 
       - name: Create Badges
@@ -60,7 +60,7 @@ jobs:
 
       - name: Pull Latest Changes
         run: |
-          git pull origin main --rebase
+          git pull origin main --rebase || echo "Rebase failed, attempting to continue"
 
       - name: Apply Stash (if any)
         run: |
@@ -71,8 +71,15 @@ jobs:
           git add README.md
           git commit -m "Update commit days badges" || echo "No changes to commit"
 
+      - name: Fetch Latest Changes Before Pushing
+        run: |
+          # Fetch latest changes to ensure we're up to date
+          git fetch origin main
+          git rebase origin/main || echo "Rebase failed, attempting to resolve automatically"
+          git rebase --continue || echo "No rebase to continue"
+
       - name: Push Changes
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
-          git push https://x-access-token:${GH_PAT}@github.com/TIL-challenge/becooq81.git
+          git push https://x-access-token:${GH_PAT}@github.com/TIL-challenge/becooq81.git || echo "Push failed, trying to resolve"

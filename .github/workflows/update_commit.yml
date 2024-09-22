@@ -3,9 +3,9 @@ name: Update Commit Activity Badges
 on:
   push:
     branches:
-      - main
+      - main # Update on push on main branch
   schedule:
-    - cron: '0 0 * * 0'  # Runs weekly on Sunday
+    - cron: '59 23 * * *' # Update everyday
   workflow_dispatch:  # Allows manual run
 
 jobs:

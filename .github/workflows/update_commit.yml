@@ -19,6 +19,7 @@ jobs:
           ref: main  # Ensure this matches your working branch
           persist-credentials: true  # Ensure GitHub token is used
           fetch-depth: 0 # Fetch all history for all branches and tags
+
       - name: Setup Git Config
         run: |
           git config --global user.email "github-actions[bot]@github.com"
@@ -67,11 +68,16 @@ jobs:
           cat total_commit_badge.md weekly_commit_badge.md README.md > temp_readme.md
           mv temp_readme.md README.md  # Replace the old README with the updated one
 
+      - name: Pull Latest Changes
+        run: |
+          # Pull the latest changes from the main branch
+          git pull origin main --rebase
+
       - name: Commit Changes
         run: |
           git add README.md
           git status  # Check if changes are staged correctly
-          git commit -m "Update commit days badges"
+          git commit -m "Update commit days badges" || echo "No changes to commit"
 
       - name: Push Changes
         env:

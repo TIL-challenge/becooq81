@@ -28,15 +28,13 @@ jobs:
       - name: Count Total Commit Days
         id: total_commit_days
         run: |
-          git log --format='%cd' --date=format:'%Y-%m-%d' | sort -u
           total_days=$(git log --format='%cd' --date=format:'%Y-%m-%d' | sort -u | wc -l)
           echo "total_commit_days=$total_days" >> $GITHUB_ENV
 
       - name: Count Weekly Commit Days
         id: weekly_commit_days
         run: |
-          git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' | sort -u
-          weekly_days=$(git log --since='7 days ago' --format='%Y-%m-%d' | sort -u | wc -l)
+          weekly_days=$(git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' | sort -u | wc -l)
           echo "weekly_commit_days=$weekly_days" >> $GITHUB_ENV
 
       - name: Create Badges
@@ -48,15 +46,18 @@ jobs:
 
       - name: Update README with Badges at Top
         run: |
-          sed -i '/Total Commit Days/d' README.md
-          sed -i '/Weekly Commit Days/d' README.md
+          # Safely remove existing badge lines
+          sed -i '/Total Commit Days/d' README.md || echo "No Total Commit Days badge found to remove"
+          sed -i '/Weekly Commit Days/d' README.md || echo "No Weekly Commit Days badge found to remove"
+
+          # Combine badges and the rest of the README
           cat total_commit_badge.md weekly_commit_badge.md README.md > temp_readme.md
           mv temp_readme.md README.md
 
       - name: Stash Changes (if any) before Pull
         run: |
           git add .
-          git stash save "temp-stash-for-pull" || echo "Nothing to stash"
+          git stash push -m "temp-stash-for-pull" || echo "Nothing to stash"
 
       - name: Pull Latest Changes
         run: |
@@ -73,7 +74,6 @@ jobs:
 
       - name: Fetch Latest Changes Before Pushing
         run: |
-          # Fetch latest changes to ensure we're up to date
           git fetch origin main
           git rebase origin/main || echo "Rebase failed, attempting to resolve automatically"
           git rebase --continue || echo "No rebase to continue"

@@ -38,18 +38,16 @@ jobs:
           git config --global user.email &quot;github-actions[bot]@github.com&quot;
           git config --global user.name &quot;github-actions[bot]&quot;
 
-      - name: Count Total Commit Days
+      - name: Count Total Commit Days (Exclude Badge Update Commits)
         id: total_commit_days
         run: |
-          git log --format='%cd' --date=format:'%Y-%m-%d' | sort -u
-          total_days=$(git log --format='%cd' --date=format:'%Y-%m-%d' | sort -u | wc -l)
+          total_days=$(git log --format='%cd' --date=format:'%Y-%m-%d' --grep='^((?!\[badge-update\]).)*$' | sort -u | wc -l)
           echo &quot;total_commit_days=$total_days&quot; &gt;&gt; $GITHUB_ENV
 
-      - name: Count Weekly Commit Days
+      - name: Count Weekly Commit Days (Exclude Badge Update Commits)
         id: weekly_commit_days
         run: |
-          git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' | sort -u
-          weekly_days=$(git log --since='7 days ago' --format='%Y-%m-%d' | sort -u | wc -l)
+          weekly_days=$(git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' --grep='^((?!\[badge-update\]).)*$' | sort -u | wc -l)
           echo &quot;weekly_commit_days=$weekly_days&quot; &gt;&gt; $GITHUB_ENV
 
       - name: Create Badges
@@ -61,15 +59,18 @@ jobs:
 
       - name: Update README with Badges at Top
         run: |
-          sed -i '/Total Commit Days/d' README.md
-          sed -i '/Weekly Commit Days/d' README.md
+          # Safely remove existing badge lines
+          sed -i '/Total Commit Days/d' README.md || echo &quot;No Total Commit Days badge found to remove&quot;
+          sed -i '/Weekly Commit Days/d' README.md || echo &quot;No Weekly Commit Days badge found to remove&quot;
+
+          # Combine badges and the rest of the README
           cat total_commit_badge.md weekly_commit_badge.md README.md &gt; temp_readme.md
           mv temp_readme.md README.md
 
       - name: Stash Changes (if any) before Pull
         run: |
           git add .
-          git stash save &quot;temp-stash-for-pull&quot; || echo &quot;Nothing to stash&quot;
+          git stash push -m &quot;temp-stash-for-pull&quot; || echo &quot;Nothing to stash&quot;
 
       - name: Pull Latest Changes
         run: |
@@ -79,14 +80,13 @@ jobs:
         run: |
           git stash pop || echo &quot;No stash to apply&quot;
 
-      - name: Commit Changes
+      - name: Commit Changes with Identifier
         run: |
           git add README.md
-          git commit -m &quot;Update commit days badges&quot; || echo &quot;No changes to commit&quot;
+          git commit -m &quot;Update commit days badges [badge-update]&quot; || echo &quot;No changes to commit&quot;
 
       - name: Fetch Latest Changes Before Pushing
         run: |
-          # Fetch latest changes to ensure we're up to date
           git fetch origin main
           git rebase origin/main || echo &quot;Rebase failed, attempting to resolve automatically&quot;
           git rebase --continue || echo &quot;No rebase to continue&quot;
@@ -95,4 +95,5 @@ jobs:
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
-          git push https://x-access-token:${GH_PAT}@github.com/TIL-challenge/becooq81.git || echo &quot;Push failed, trying to resolve&quot;</code></pre>
+          git push https://x-access-token:${GH_PAT}@github.com/TIL-challenge/becooq81.git || echo &quot;Push failed, trying to resolve&quot;
+</code></pre>

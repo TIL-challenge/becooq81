@@ -25,16 +25,16 @@ jobs:
           git config --global user.email "github-actions[bot]@github.com"
           git config --global user.name "github-actions[bot]"
 
-      - name: Count Total Commit Days
+      - name: Count Total Commit Days (Exclude Badge Update Commits)
         id: total_commit_days
         run: |
-          total_days=$(git log --format='%cd' --date=format:'%Y-%m-%d' | sort -u | wc -l)
+          total_days=$(git log --format='%cd' --date=format:'%Y-%m-%d' --grep='^((?!\[badge-update\]).)*$' | sort -u | wc -l)
           echo "total_commit_days=$total_days" >> $GITHUB_ENV
 
-      - name: Count Weekly Commit Days
+      - name: Count Weekly Commit Days (Exclude Badge Update Commits)
         id: weekly_commit_days
         run: |
-          weekly_days=$(git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' | sort -u | wc -l)
+          weekly_days=$(git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' --grep='^((?!\[badge-update\]).)*$' | sort -u | wc -l)
           echo "weekly_commit_days=$weekly_days" >> $GITHUB_ENV
 
       - name: Create Badges
@@ -67,10 +67,10 @@ jobs:
         run: |
           git stash pop || echo "No stash to apply"
 
-      - name: Commit Changes
+      - name: Commit Changes with Identifier
         run: |
           git add README.md
-          git commit -m "Update commit days badges" || echo "No changes to commit"
+          git commit -m "Update commit days badges [badge-update]" || echo "No changes to commit"
 
       - name: Fetch Latest Changes Before Pushing
         run: |

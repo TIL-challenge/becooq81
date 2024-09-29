@@ -11,6 +11,7 @@
 <p>TIL할 레포지토리의 <code>Settings</code> &gt; <code>Secrets and Variables</code> &gt; <code>Actions</code> 에서 <code>GH_PAT</code>라는 이름의 시크릿을 생성하고, 값에 복사해둔 토큰을 붙여넣는다</p>
 <h1 id="2-github-workflow를-추가한다">2. GitHub Workflow를 추가한다</h1>
 <p><code>.github/workflows/update_commit.yml</code>을 생성하고 다음을 복사한 후, github url을 적절하게 넣는다</p>
+<p>커밋을 세고 반영하는 커밋은 반영되지 않도록 필터 로직을 추가했다</p>
 <pre><code class="language-yml">name: Update Commit Activity Badges
 
 on:
@@ -41,14 +42,15 @@ jobs:
       - name: Count Total Commit Days (Exclude Badge Update Commits)
         id: total_commit_days
         run: |
-          total_days=$(git log --format='%cd' --date=format:'%Y-%m-%d' --grep='^((?!\[badge-update\]).)*$' | sort -u | wc -l)
+          total_days=$(git log --format='%cd' --date=format:'%Y-%m-%d' --grep='badge' --invert-grep | sort -u | wc -l)
           echo &quot;total_commit_days=$total_days&quot; &gt;&gt; $GITHUB_ENV
 
       - name: Count Weekly Commit Days (Exclude Badge Update Commits)
         id: weekly_commit_days
         run: |
-          weekly_days=$(git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' --grep='^((?!\[badge-update\]).)*$' | sort -u | wc -l)
+          weekly_days=$(git log --since='7 days ago' --format='%cd' --date=format:'%Y-%m-%d' --grep='badge' --invert-grep | sort -u | wc -l)
           echo &quot;weekly_commit_days=$weekly_days&quot; &gt;&gt; $GITHUB_ENV
+
 
       - name: Create Badges
         run: |

@@ -1,5 +1,5 @@
-![Total Commit Days](https://img.shields.io/badge/total_commit_days-34-blue?cache=1735002560)
-![Weekly Commit Days](https://img.shields.io/badge/weekly_commit_days-2-green?cache=1735002560)
+![Total Commit Days](https://img.shields.io/badge/total_commit_days-34-blue?cache=1735088913)
+![Weekly Commit Days](https://img.shields.io/badge/weekly_commit_days-1-green?cache=1735088913)
 
 # becooq81's TIL (Today I Learned) 🐣
 
